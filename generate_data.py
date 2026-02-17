@@ -35,4 +35,4 @@ def generate_csv(n_days=90):
 
 
 if __name__ == "__main__":
-    generate_behavior_csv()
+    generate_csv()

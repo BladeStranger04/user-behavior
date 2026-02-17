@@ -1,5 +1,6 @@
 import mlflow
-from src.config import *
+import torch
+from src.config import DEVICE, WINDOW_SIZE, HIDDEN_SIZE, NUM_LAYERS, LR, EPOCHS, BATCH_SIZE
 from src.data_loader import load_from_csv, TimeSeriesDS, DataLoader
 from src.model import HybridForecaster
 from src.trainer import train_model
@@ -16,9 +17,12 @@ def main():
     criterion = torch.nn.MSELoss()
 
     mlflow.set_experiment("user_behavior_v1")
+
     with mlflow.start_run():
         train_model(model, loader, criterion, optimizer, EPOCHS)
         mlflow.pytorch.log_model(model, "model_final")
+
+    torch.save(model.state_dict(), "model_final.pt")
 
 
 if __name__ == "__main__":

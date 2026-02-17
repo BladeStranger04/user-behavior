@@ -35,4 +35,4 @@ class TimeSeriesDS(Dataset):
         y = self.data[idx + self.window]
 
         # lstm  ожидает (seq_len, input_size) внутри батча
-        return torch.FloatTensor(x), torch.FloatTensor(y)
+        return torch.FloatTensor(x), torch.FloatTensor([y])

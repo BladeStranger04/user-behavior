@@ -1,6 +1,7 @@
 import mlflow
 import torch
 from tqdm import tqdm
+from config import DEVICE
 
 
 def train_model(model, loader, criterion, optimizer, epochs):
@@ -11,6 +12,7 @@ def train_model(model, loader, criterion, optimizer, epochs):
         total_loss = 0
 
         for x, y in pbar:
+            x, y = x.to(DEVICE), y.to(DEVICE)
             optimizer.zero_grad()
             pred = model(x)
             loss = criterion(pred, y)
