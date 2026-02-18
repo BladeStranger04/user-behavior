@@ -1,7 +1,7 @@
 import mlflow
 import torch
 from tqdm import tqdm
-from config import DEVICE
+from src.config import DEVICE
 
 
 def train_model(model, loader, criterion, optimizer, epochs):

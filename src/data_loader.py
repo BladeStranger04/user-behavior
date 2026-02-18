@@ -5,34 +5,41 @@ from torch.utils.data import Dataset, DataLoader
 from sklearn.preprocessing import StandardScaler
 
 
-def load_from_csv(path='data/user_activity.csv'):
+def load_from_csv(path):
 
     df = pd.read_csv(path)
-    # колонка с активностью
-    data = df['user_activity'].values.astype('float32').reshape(-1, 1)
+    df = df.dropna().reset_index(drop=True)
 
-    scaler = StandardScaler()
-    data_scaled = scaler.fit_transform(data)
+    #data = df['user_activity'].values.astype('float32').reshape(-1, 1)
 
-    return data_scaled, scaler
+    y = df['y'].values.astype('float32').reshape(-1, 1)
+    X = df.drop(['timestamp', 'y'], axis=1).values.astype('float32')
 
+    scaler_x = StandardScaler()
+    scaler_y = StandardScaler()
+
+    X_scaled = scaler_x.fit_transform(X)
+    y_scaled = scaler_y.fit_transform(y)
+
+
+    return X_scaled, y_scaled, scaler_y
 
 class TimeSeriesDS(Dataset):
 
-    def __init__(self, data, window=24):
-        self.data = data
+    def __init__(self, X, y,window=24):
+        self.X = X
+        self.y = y
         self.window = window
 
     def __len__(self):
         # чтобы не выйти за границы при взятии y
-        return len(self.data) - self.window
+        return len(self.X) - self.window
 
     def __getitem__(self, idx):
         # x: окно данных
-        x = self.data[idx: idx + self.window]
+        x_seq = self.X[idx : idx + self.window]
 
         # y: следующее значение за окном
-        y = self.data[idx + self.window]
+        y_val = self.y[idx + self.window]
 
-        # lstm  ожидает (seq_len, input_size) внутри батча
-        return torch.FloatTensor(x), torch.FloatTensor([y])
+        return torch.from_numpy(x_seq).float(), torch.from_numpy(y_val).float()
